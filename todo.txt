@@ -1,5 +1,4 @@
 - Bugfixes
-    - Dashboard form wants to resubmit on refresh; fix with redirect after POST
     - Dashboard form select options are not game-specific; fix with custom query
 - Input validation
     - Validate hand sizes
