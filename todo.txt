@@ -1,0 +1,17 @@
+- Input validation
+    - Validate hand sizes
+    - Validate relation type # cards
+    - Validate logical possibility of relations
+- CRUD
+    - Create Game
+    - Create Player
+- Navigation
+    - Navbar
+    - Links on Games list home
+    - Back link on game dashboard
+- Styling
+    - Bootstrapified base template
+    - Bootstrap form controls
+- Inference engine
+    - Inference engine class
+    - Hook inference engine into ClueRelation input
