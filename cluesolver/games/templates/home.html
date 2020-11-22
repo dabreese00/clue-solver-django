@@ -1,0 +1,7 @@
+<h1>Hello world</h1>
+
+<ul>
+	{% for game in object_list %}
+	<li>Game {{ game.id }}, started at {{ game.created_timestamp }}</li>
+	{% endfor %}
+</ul>
