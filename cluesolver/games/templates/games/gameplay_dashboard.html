@@ -1,4 +1,11 @@
-<h1>Game {{ game.id }}: dashboard</h1>
+{% extends 'games/base.html' %}
+
+{% block title %}
+Game {{ game.id }}: Dashboard
+{% endblock %}
+
+{% block content %}
+<h1>Game {{ game.id }}: Dashboard</h1>
 
 {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
 
@@ -28,3 +35,6 @@ Relations:
 	<li>{{ relation }}</li>
 	{% endfor %}
 </ul>
+<br>
+<a href="{% url 'games:home' %}" class="btn btn-secondary">Back</a>
+{% endblock %}

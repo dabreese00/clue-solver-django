@@ -1,3 +1,6 @@
+- Bugfixes
+    - Dashboard form wants to resubmit on refresh; fix with redirect after POST
+    - Dashboard form select options are not game-specific; fix with custom query
 - Input validation
     - Validate hand sizes
     - Validate relation type # cards
@@ -5,12 +8,7 @@
 - CRUD
     - Create Game
     - Create Player
-- Navigation
-    - Navbar
-    - Links on Games list home
-    - Back link on game dashboard
 - Styling
-    - Bootstrapified base template
     - Bootstrap form controls
 - Inference engine
     - Inference engine class
