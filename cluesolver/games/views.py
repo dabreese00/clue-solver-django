@@ -7,8 +7,8 @@ from .models import Game
 
 class HomeView(ListView):
     model = Game
-    template_name = 'home.html'
+    template_name = 'games/home.html'
 
 class GameplayDashboardView(DetailView):
     model = Game
-    template_name = 'gameplay_dashboard.html'
+    template_name = 'games/gameplay_dashboard.html'

@@ -4,6 +4,9 @@ from django.db import models
 class Game(models.Model):
     created_timestamp = models.DateTimeField(auto_now_add=True)
 
+    def __str__(self):
+        return "Game {}, created {}".format(self.id, self.created_timestamp)
+
 
 class Player(models.Model):
 
