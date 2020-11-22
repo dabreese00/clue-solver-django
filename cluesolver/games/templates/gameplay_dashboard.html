@@ -1,0 +1,22 @@
+<h1>Game {{ game.id }}: dashboard</h1>
+
+Players:
+<ul>
+	{% for player in game.players.all %}
+	<li>{{ player.name }}</li>
+	{% endfor %}
+</ul>
+
+Cards:
+<ul>
+	{% for card in game.cards.all %}
+	<li>{{ card.name }}</li>
+	{% endfor %}
+</ul>
+
+Relations:
+<ul>
+	{% for relation in game.known_relations.all %}
+	<li>{{ relation }}</li>
+	{% endfor %}
+</ul>

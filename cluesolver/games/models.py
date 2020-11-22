@@ -69,4 +69,4 @@ class ClueRelation(models.Model):
         return "{} {}: [{}]".format(
                 self.player, 
                 self.rel_type, 
-                self.card_set.first())
+                self.cards.first())
