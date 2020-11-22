@@ -4,5 +4,5 @@ from . import views
 app_name = 'games'
 urlpatterns = [
     path('', views.HomeView.as_view(), name='home'),
-    path('dashboard/<int:pk>/', views.GameplayDashboardView.as_view(), name='gameplay-dashboard'),
+    path('dashboard/<int:game_id>/', views.gameplay_dashboard, name='gameplay-dashboard'),
 ]

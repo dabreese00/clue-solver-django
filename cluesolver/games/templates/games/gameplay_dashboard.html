@@ -1,5 +1,13 @@
 <h1>Game {{ game.id }}: dashboard</h1>
 
+{% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
+
+<form method="post">
+	{% csrf_token %}
+	{{ form }}
+	<input type="submit" value="Record new relation">
+</form>
+
 Players:
 <ul>
 	{% for player in game.players.all %}
