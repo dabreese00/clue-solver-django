@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponseBadRequest
 from django.views.generic import ListView
-from .models import Game, ClueRelation
+from .models import Game, Player, GameCard, ClueRelation
 from .forms import ClueRelationForm
 
 
@@ -27,8 +27,12 @@ def gameplay_dashboard(request, game_id):
         else:
             return HttpResponseBadRequest('Invalid form data.')
 
+    form = ClueRelationForm()
+    form.fields['player'].queryset = Player.objects.filter(game=game)
+    form.fields['cards'].queryset = GameCard.objects.filter(game=game)
+
     context = {
         'game': game,
-        'form': ClueRelationForm()
+        'form': form
     }
     return render(request, 'games/gameplay_dashboard.html', context)

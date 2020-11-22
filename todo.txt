@@ -1,5 +1,3 @@
-- Bugfixes
-    - Dashboard form select options are not game-specific; fix with custom query
 - Input validation
     - Validate hand sizes
     - Validate relation type # cards
