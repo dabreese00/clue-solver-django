@@ -20,11 +20,25 @@
   <div class="collapse navbar-collapse" id="navbarSupportedContent">
     <ul class="navbar-nav mr-auto">
       <li class="nav-item">
-        <a class="nav-link" href="#">New Game</a>
+          <a class="nav-link" href="{% url 'games:create-game' %}">New Game</a>
       </li>
     </ul>
   </div>
 </nav>
+
+
+{% for message in messages %}
+{% if message.level == DEFAULT_MESSAGE_LEVELS.ERROR %}
+<div class="alert alert-danger" role="alert">
+    {{ message }}
+</div>
+{% else %}
+<div class="alert alert-primary" role="alert">
+    {{ message }}
+</div>
+{% endif %}
+{% endfor %}
+
 
 	  <br/>
 	  <div class="container">

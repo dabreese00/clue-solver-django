@@ -1,13 +1,46 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponseBadRequest
 from django.views.generic import ListView
+from django.contrib import messages
 from .models import Game, Player, GameCard, ClueRelation
-from .forms import ClueRelationForm
+from .forms import ClueRelationForm, CreateGameForm
 
 
 class HomeView(ListView):
     model = Game
     template_name = 'games/home.html'
+
+
+def clone_card_to_gamecard(card, game):
+    return GameCard.objects.create(
+        name=card.name,
+        card_type=card.card_type,
+        game=game
+    )
+
+
+def create_game(request):
+
+    if request.method == 'POST':
+        form = CreateGameForm(request.POST)
+        if form.is_valid():
+            game = Game.objects.create()
+
+            # from cards.models - Card, CardSet
+            cardset = form.cleaned_data['card_set']
+            for card in cardset.cards.all():
+                _ = clone_card_to_gamecard(card, game)
+
+            messages.success(
+                request,
+                'Game {} created.'.format(game.id)
+            )
+            return redirect('games:gameplay-dashboard', game.id)
+    else:
+        form = CreateGameForm()
+
+    context = {'form': form}
+    return render(request, 'games/create_game.html', context)
 
 
 def gameplay_dashboard(request, game_id):
