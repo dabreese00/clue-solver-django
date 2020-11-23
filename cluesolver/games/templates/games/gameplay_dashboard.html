@@ -18,14 +18,19 @@ Game {{ game.id }}: Dashboard
 Players:
 <ul>
 	{% for player in game.players.all %}
-	<li>{{ player.name }}</li>
+	<li>{{ player }}</li>
 	{% endfor %}
 </ul>
+
+<br/>
+<a href="{% url 'games:create-player' game.id %}" class="btn btn-primary">Add Player</a>
+<br/>
+<br/>
 
 Cards:
 <ul>
 	{% for card in game.cards.all %}
-	<li>{{ card.name }}</li>
+	<li>{{ card }}</li>
 	{% endfor %}
 </ul>
 

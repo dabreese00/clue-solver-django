@@ -3,7 +3,7 @@ from django.http import HttpResponseBadRequest
 from django.views.generic import ListView
 from django.contrib import messages
 from .models import Game, Player, GameCard, ClueRelation
-from .forms import ClueRelationForm, CreateGameForm
+from .forms import ClueRelationForm, CreateGameForm, PlayerForm
 
 
 class HomeView(ListView):
@@ -69,3 +69,27 @@ def gameplay_dashboard(request, game_id):
         'form': form
     }
     return render(request, 'games/gameplay_dashboard.html', context)
+
+
+def create_player(request, game_id):
+
+    game = get_object_or_404(Game, id=game_id)
+
+    if request.method == 'POST':
+        form = PlayerForm(request.POST)
+        if form.is_valid():
+            p = Player.objects.create(
+                name=form.cleaned_data['name'],
+                hand_size=form.cleaned_data['hand_size'],
+                game=game
+            )
+
+            messages.success(request, 'Player {} created'.format(p))
+            return redirect('games:gameplay-dashboard', game.id)
+    else:
+        form = PlayerForm()
+        context = {
+            'game': game,
+            'form': form
+        }
+        return render(request, 'games/create_player.html', context)

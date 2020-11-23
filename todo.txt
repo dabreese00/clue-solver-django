@@ -1,13 +1,17 @@
 - Input validation
-    - Validate hand sizes
-    - Validate relation type # cards
-    - Validate logical possibility of relations
+    - [High] Validate hand sizes
+    - [High] Validate relation type # cards
+    - [High] Validate logical possibility of relations
 - CRUD
-    - Create Player
+    - [Medium] Delete games
+    - [Low] Update and delete players
 - Styling
-    - Add CRUD success messages
-    - Bootstrap form controls
-    - Grid view for dashboard
+    - [Medium] Bootstrap form controls
+    - [Low] Add CRUD success messages throughout
+    - [Low] Grid view for dashboard
 - Inference engine
-    - Inference engine class
-    - Hook inference engine into ClueRelation input
+    - [Medium] Inference engine class
+    - [Medium] Hook inference engine into ClueRelation input
+- Testing
+    - [Medium] Test clone_card_to_gamecard
+    - [Medium] Try writing some view tests

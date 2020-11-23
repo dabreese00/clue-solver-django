@@ -13,8 +13,8 @@ class Player(models.Model):
     name = models.CharField(max_length=255)
     hand_size = models.IntegerField()
     game = models.ForeignKey(
-            Game, 
-            on_delete=models.CASCADE, 
+            Game,
+            on_delete=models.CASCADE,
             related_name='players')
 
     class Meta:
@@ -29,13 +29,13 @@ class GameCard(models.Model):
     class CardType(models.TextChoices):
         PERSON = 'P'
         WEAPON = 'W'
-        ROOM   = 'R'
+        ROOM = 'R'
 
     name = models.CharField(max_length=255)
     card_type = models.CharField(max_length=1, choices=CardType.choices)
     game = models.ForeignKey(
-            Game, 
-            on_delete=models.CASCADE, 
+            Game,
+            on_delete=models.CASCADE,
             related_name='cards')
 
     class Meta:
@@ -47,7 +47,7 @@ class GameCard(models.Model):
 
 
 class ClueRelation(models.Model):
-    
+
     class RelationType(models.TextChoices):
         HAVE = 'H'
         SHOW = 'S'
@@ -55,21 +55,21 @@ class ClueRelation(models.Model):
 
     rel_type = models.CharField(max_length=1, choices=RelationType.choices)
     player = models.ForeignKey(
-            Player, 
-            on_delete=models.CASCADE, 
+            Player,
+            on_delete=models.CASCADE,
             related_name='relations_containing')
     cards = models.ManyToManyField(
-            GameCard, 
+            GameCard,
             related_name='relations_containing')
     game = models.ForeignKey(
-            Game, 
-            on_delete=models.CASCADE, 
+            Game,
+            on_delete=models.CASCADE,
             related_name='known_relations')
 
     def __str__(self):
         # TODO: Generalize for relations with more than 1 card.
         # TODO: Make rel_type display label
         return "{} {}: [{}]".format(
-                self.player, 
-                self.rel_type, 
+                self.player,
+                self.rel_type,
                 self.cards.first())
