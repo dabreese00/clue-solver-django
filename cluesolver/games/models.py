@@ -73,3 +73,14 @@ class ClueRelation(models.Model):
                 self.player,
                 self.rel_type,
                 self.cards.first())
+
+    def validate_show_card_types(cards_list):
+        """Check that a set of cards have valid types to comprise a show."""
+
+        if len(cards_list) != 3:
+            raise ValueError("A show must have 3 cards.")
+
+        card_types_represented = set([c.card_type for c in cards_list])
+        card_types_possible = set(GameCard.CardType)
+
+        return card_types_represented == card_types_possible

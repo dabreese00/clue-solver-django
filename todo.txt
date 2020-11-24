@@ -1,6 +1,5 @@
 - Input validation
     - [High] Validate hand sizes
-    - [High] Validate relation type # cards
     - [High] Validate logical possibility of relations
 - CRUD
     - [Medium] Delete games
