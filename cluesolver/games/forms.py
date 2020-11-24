@@ -30,13 +30,12 @@ class ClueRelationForm(forms.ModelForm):
                         "A Show must contain exactly 3 cards.",
                         code='invalid-show-card-count'
                     )
-                else:
-                    if not ClueRelation.validate_show_card_types(cards.all()):
-                        raise ValidationError(
-                            "A Show must contain 1 card of each type "
-                            "(person, weapon, room).",
-                            code='invalid-show-card-types'
-                        )
+                if not ClueRelation.validate_show_card_types(cards.all()):
+                    raise ValidationError(
+                        "A Show must contain 1 card of each type "
+                        "(person, weapon, room).",
+                        code='invalid-show-card-types'
+                    )
 
 
 class CreateGameForm(forms.Form):

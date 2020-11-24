@@ -208,3 +208,128 @@ class GameplayDashboardViewTests(TestCase):
                                })
 
         self.assertNotEqual(response.status_code, 302)
+
+    def test_invalid_player_hand_size(self):
+        g = Game.objects.create()
+        cards = set()
+        person = GameCard.CardType.PERSON
+        weapon = GameCard.CardType.WEAPON
+        room = GameCard.CardType.ROOM
+        card_tuple_list = (
+            ("a", person),
+            ("b", person),
+            ("c", person),
+            ("d", person),
+            ("e", weapon),
+            ("f", weapon),
+            ("g", weapon),
+            ("h", weapon),
+            ("i", weapon),
+            ("j", room),
+            ("k", room),
+            ("l", room),
+            ("m", room),
+            ("n", room),
+            ("o", room),
+        )
+        for c in card_tuple_list:
+            cards.add(GameCard.objects.create(
+                name=c[0],
+                card_type=c[1],
+                game=g
+            ))
+
+        players = set()
+        player_tuple_list = (
+            ("a", 3),
+            ("b", 3),
+            ("c", 3),
+        )
+        for p in player_tuple_list:
+            players.add(Player.objects.create(
+                name=p[0],
+                hand_size=p[1],
+                game=g
+            ))
+
+        # Upon adding player "d", players collectively have 13 cards, leaving
+        # only 2 for the confidential file.
+        client = Client()
+
+        # Form submission should succeed
+        response = client.post(reverse('games:create-player', args='1'),
+                               {
+                                   'name': 'd',
+                                   'hand_size': 4
+                               })
+
+        self.assertEqual(
+            response.status_code,
+            302
+        )
+
+        # But the dashboard template should be aware of the mismatch
+        response = client.get(reverse('games:gameplay-dashboard', args='1'))
+
+        self.assertFalse(response.context['game'].hand_sizes_add_up)
+
+    def test_valid_player_hand_size(self):
+        g = Game.objects.create()
+        cards = set()
+        person = GameCard.CardType.PERSON
+        weapon = GameCard.CardType.WEAPON
+        room = GameCard.CardType.ROOM
+        card_tuple_list = (
+            ("a", person),
+            ("b", person),
+            ("c", person),
+            ("d", person),
+            ("e", weapon),
+            ("f", weapon),
+            ("g", weapon),
+            ("h", weapon),
+            ("i", weapon),
+            ("j", room),
+            ("k", room),
+            ("l", room),
+            ("m", room),
+            ("n", room),
+            ("o", room),
+        )
+        for c in card_tuple_list:
+            cards.add(GameCard.objects.create(
+                name=c[0],
+                card_type=c[1],
+                game=g
+            ))
+
+        players = set()
+        player_tuple_list = (
+            ("a", 3),
+            ("b", 3),
+            ("c", 3),
+        )
+        for p in player_tuple_list:
+            players.add(Player.objects.create(
+                name=p[0],
+                hand_size=p[1],
+                game=g
+            ))
+
+        client = Client()
+
+        # Form submission should succeed
+        response = client.post(reverse('games:create-player', args='1'),
+                               {
+                                   'name': 'd',
+                                   'hand_size': 3
+                               })
+
+        self.assertEqual(
+            response.status_code,
+            302
+        )
+
+        response = client.get(reverse('games:gameplay-dashboard', args='1'))
+
+        self.assertTrue(response.context['game'].hand_sizes_add_up)

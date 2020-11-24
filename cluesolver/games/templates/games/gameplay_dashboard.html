@@ -16,6 +16,10 @@ Game {{ game.id }}: Dashboard
 </form>
 
 Players:
+<br/>
+{% if not game.hand_sizes_add_up %}
+    Warning: Player hand sizes do not add up to 3 less than the total number of cards.
+{% endif %}
 <ul>
 	{% for player in game.players.all %}
 	<li>{{ player }}</li>

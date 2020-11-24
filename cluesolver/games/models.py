@@ -7,6 +7,16 @@ class Game(models.Model):
     def __str__(self):
         return "Game {}, created {}".format(self.id, self.created_timestamp)
 
+    @property
+    def hand_sizes_add_up(self):
+        """Check if hand sizes are consistent with total number of cards"""
+
+        num_cards_in_hands = 0
+        for p in self.players.all():
+            num_cards_in_hands += p.hand_size
+
+        return num_cards_in_hands == len(self.cards.all()) - 3
+
 
 class Player(models.Model):
 
@@ -67,18 +77,18 @@ class ClueRelation(models.Model):
             related_name='known_relations')
 
     def __str__(self):
-        # TODO: Generalize for relations with more than 1 card.
-        # TODO: Make rel_type display label
-        return "{} {}: [{}]".format(
-                self.player,
-                self.rel_type,
-                self.cards.first())
+        return "{} {}: {}".format(
+                self.player.name,
+                self.get_rel_type_display(),
+                [str(c) for c in list(self.cards.all())])
 
     def validate_show_card_types(cards_list):
         """Check that a set of cards have valid types to comprise a show."""
 
-        if len(cards_list) != 3:
-            raise ValueError("A show must have 3 cards.")
+        if len(cards_list) != len(GameCard.CardType):
+            # We don't validate this here; it should have been already
+            # validated before calling.
+            raise ValueError("The number of cards is wrong.")
 
         card_types_represented = set([c.card_type for c in cards_list])
         card_types_possible = set(GameCard.CardType)
