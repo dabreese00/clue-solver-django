@@ -1,6 +1,7 @@
 - Input validation
     - [High] Validate hand sizes
     - [High] Validate logical possibility of relations
+    - [Medium] Validate game-consistency of new relations' members
 - CRUD
     - [Medium] Delete games
     - [Low] Update and delete players
