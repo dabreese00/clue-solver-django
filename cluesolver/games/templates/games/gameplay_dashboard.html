@@ -32,7 +32,7 @@ Game {{ game.id }}: Dashboard
 
 <div class="row">
     <div class="col-sm">
-        <table class="table">
+        <table class="table table-sm table-hover">
             <thead>
                 <tr>
                     <th scope="col">Known relations</th>
@@ -48,10 +48,13 @@ Game {{ game.id }}: Dashboard
                     <tr>
                         <th scope="row">{{ card.name }}</th>
                         {% for player in game.players.all %}
-                        <!-- TODO: if player.has c -->
-                        <!-- TODO: if player.pass c -->
-                        <!-- TODO: for s in player.shows where c in show -->
-                            <td>ABC</td>
+                            <td>
+                            {% for r in player.relations_containing.all %}
+                                {% if card in r.cards.all %}
+                                    {{ r.rel_type }}
+                                {% endif %}
+                            {% endfor %}
+                            </td>
                         {% endfor %}
                     </tr>
                 {% endfor %}
