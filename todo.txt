@@ -4,7 +4,8 @@
     - [Medium] Delete games
     - [Low] Update and delete players
 - Styling
-    - [High] Bootstrap and format dashboard template
+    - [Medium] New dashboard based on relations table (a.k.a. clue sheet)
+    - [Medium] Bootstrap all forms
     - [Low] Add CRUD success messages throughout
     - [Low] Grid view for dashboard
 - Inference engine
