@@ -49,11 +49,22 @@ Game {{ game.id }}: Dashboard
                         <th scope="row">{{ card.name }}</th>
                         {% for player in game.players.all %}
                             <td>
-                            {% for r in player.relations_containing.all %}
-                                {% if card in r.cards.all %}
-                                    {{ r.rel_type }}
-                                {% endif %}
-                            {% endfor %}
+                                {% for r in player.relations_containing.all %}
+                                    {% if card in r.cards.all %}
+                                        {% if r.rel_type == "H" %}
+                                            <span class="badge badge-primary">
+                                        {% elif r.rel_type == "P" %}
+                                            <span class="badge badge-success">
+                                        {% elif r.rel_type == "S" %}
+                                            <span class="badge badge-light">
+                                        {% endif %}
+                                                {{ r.rel_type }}
+                                                {% if r.rel_type == "S" %}
+                                                    <sub>{{ r.id }}</sub>
+                                                {% endif %}
+                                            </span>
+                                    {% endif %}
+                                {% endfor %}
                             </td>
                         {% endfor %}
                     </tr>
