@@ -1,10 +1,14 @@
+- Sharing
+    - [High] License, README, and publish
+- Deployment
+    - [High] Deploy on the web
 - Input validation
     - [Medium] Validate game-consistency of new relations' members
 - CRUD
+    - [High] User authentication
     - [Medium] Delete games
     - [Low] Update and delete players
 - Styling
-    - [Medium] New dashboard based on relations table (a.k.a. clue sheet)
     - [Medium] Bootstrap all forms
     - [Low] Add CRUD success messages throughout
     - [Low] Grid view for dashboard
@@ -13,5 +17,4 @@
     - [Medium] Inference engine class
     - [Medium] Hook inference engine into ClueRelation input
 - Testing
-    - [Medium] Test clone_card_to_gamecard
     - [Low] Explore how to refactor tests to DRY a bit
