@@ -47,7 +47,7 @@ def gameplay_dashboard(request, game_id):
     game = get_object_or_404(Game, id=game_id)
 
     if request.method == 'POST':
-        form = ClueRelationForm(request.POST)
+        form = ClueRelationForm(game, request.POST)
         if form.is_valid():
             r = ClueRelation.objects.create(
                 rel_type=form.cleaned_data['rel_type'],
@@ -57,9 +57,7 @@ def gameplay_dashboard(request, game_id):
             r.cards.set(form.cleaned_data['cards'])
             return redirect('games:gameplay-dashboard', game.id)
     else:
-        form = ClueRelationForm()
-        form.fields['player'].queryset = Player.objects.filter(game=game)
-        form.fields['cards'].queryset = GameCard.objects.filter(game=game)
+        form = ClueRelationForm(game)
 
     context = {
         'game': game,

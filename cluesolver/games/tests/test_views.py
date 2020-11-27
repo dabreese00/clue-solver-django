@@ -92,6 +92,20 @@ class GameplayDashboardViewTests(TestCase):
             hand_size=3,
             game=g
         )
+
+        # Extra data to catch other games bleeding into form
+        g2 = Game.objects.create()
+        _ = GameCard.objects.create(
+            name="Professor Plum",
+            card_type=GameCard.CardType.PERSON,
+            game=g2
+        )
+        _ = GameCard.objects.create(
+            name="Miss Scarlet",
+            card_type=GameCard.CardType.PERSON,
+            game=g2
+        )
+
         client = Client()
         response = client.post(reverse('games:gameplay-dashboard', args='1'),
                                {
@@ -107,6 +121,13 @@ class GameplayDashboardViewTests(TestCase):
                 code='invalid-show-card-count'
             )
         )
+
+        # Catch other games bleeding into form
+        for fieldname in ['player', 'cards']:
+            field = form.fields[fieldname]
+            for q in field.queryset:
+                with self.subTest(i=q):
+                    self.assertEqual(q.game, g)
 
     def test_invalid_have_wrong_number_cards(self):
         g = Game.objects.create()

@@ -1,10 +1,15 @@
 from django import forms
 from django.core.exceptions import ValidationError
-from .models import ClueRelation, Player
+from .models import ClueRelation, Player, GameCard
 from cards.models import CardSet
 
 
 class ClueRelationForm(forms.ModelForm):
+    def __init__(self, game, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['player'].queryset = Player.objects.filter(game=game)
+        self.fields['cards'].queryset = GameCard.objects.filter(game=game)
+
     class Meta:
         model = ClueRelation
         fields = ['rel_type', 'player', 'cards']
