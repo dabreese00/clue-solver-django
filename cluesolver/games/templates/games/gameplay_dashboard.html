@@ -32,26 +32,34 @@ Game {{ game.id }}: Dashboard
 
 <div class="row">
     <div class="col-sm">
-        <div class="accordion" id="relations-accordion">
-            <div class="card">
-                <div class="card-header" id="relations">
-                    <h2 class="mb-0">
-                        <button class="btn btn-link btn-block text-left" type="button" data-toggle="collapse" data-target="#relationsList" aria-expanded="true" aria-controls="relationsList">
-                            Known Relations
-                        </button>
-                    </h2>
-                </div>
-                <div id="relationsList" class="collapse show" aria-labelledby="relations" data-parent="#relations-accordion">
-                    <ul class="list-group list-group-flush">
-                    	{% for relation in game.known_relations.all %}
-                            <li class="list-group-item">
-                                {{ relation }}
-                            </li>
-                    	{% endfor %}
-                    </ul>
-                </div>
-            </div>
-        </div>
+        <table class="table table-sm table-hover">
+            <thead>
+                <tr>
+                    <th scope="col">Known relations</th>
+                    {% for player in game.players.all %}
+                        <th scope="col">{{ player.name }}</th>
+                    {% endfor %}
+                <tr>
+            </thead>
+            <tbody>
+                <!-- TODO: for t.label where t in ClueRelation.CardType -->
+                {% for card in game.cards.all %}
+                <!-- TODO: for c in game.cards.all where c.card_type == t -->
+                    <tr>
+                        <th scope="row">{{ card.name }}</th>
+                        {% for player in game.players.all %}
+                            <td>
+                            {% for r in player.relations_containing.all %}
+                                {% if card in r.cards.all %}
+                                    {{ r.rel_type }}
+                                {% endif %}
+                            {% endfor %}
+                            </td>
+                        {% endfor %}
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
     </div>
     <div class="col-sm-4">
         <div class="row">
