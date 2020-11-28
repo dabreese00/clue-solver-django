@@ -9,10 +9,50 @@ Currently it lets you create and track games.
 - Optionally catching your obvious mistakes, coming soon.
 - "Cheat mode" coming soon... ;)
 
+## How to develop
 
-## Installing
+Assuming you already have Python 3.6 or higher:
 
-To-do
+```console
+$ git clone https://github.com/dabreese00/clue-solver-django.git
+$ cd clue-solver-django
+$ python3 -m venv .venv
+$ source .venv/bin/activate
+(.venv) $ pip install django
+(.venv) $ cd cluesolver
+(.venv) $ ./manage.py migrate
+(.venv) $ ./manage.py runserver
+```
+
+Open a browser, navigate to `127.0.0.1:8000`, and you are up and running!
+
+
+## How to deploy
+
+Django requires:
+
+- Python 3.6 or higher
+- PostgreSQL 9.5 or higher
+
+### The hard way
+
+The hard way is the only way so far.  Stay tuned.
+
+- Ubuntu 18.04
+- Install prerequisites:
+```console
+$ sudo apt -y install \
+    python3 python3-venv python3-dev build-essential \
+    postgresql supervisor nginx git
+```
+- Git clone the repository and `cd` into it.
+- Create a Python 3 virtualenv.
+- Activate the virtualenv and `pip install -r requirements.txt`.
+- Setup PostgreSQL database, user and password.
+- Setup supervisor to run `gunicorn -b localhost:8000 -w 4 cluesolver.wsgi`.
+- Copy Django static files.
+- Setup nginx to proxy to gunicorn & serve static files.
+- Setup Django settings for production: See [Django Deployment Checklist](https://docs.djangoproject.com/en/3.1/howto/deployment/checklist/).
 
 
 ## Life's story
