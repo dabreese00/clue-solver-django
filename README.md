@@ -65,6 +65,7 @@ Django requires:
 - Python 3.6 or higher
 - PostgreSQL 9.5 or higher
 
+
 ### The hard way
 
 Rough outline (apply sysadmin common sense):
@@ -83,57 +84,192 @@ $ sudo apt -y install python3 python3-venv postgresql supervisor nginx git
 - Setup nginx to proxy to gunicorn & serve static files.
 - Setup Django settings for production: See [Django Deployment Checklist](https://docs.djangoproject.com/en/3.1/howto/deployment/checklist/).
 
-### The new-fangled Docker way
+Don't forget SSL (best use Let's Encrypt).
 
-This method has promise because it gives you a production setup that's so
-easy and portable, it can almost be your local dev server too.
+Then you can use PostgreSQL dumps and/or Django dumps for backup and recovery.
 
-That said, these instructions by themselves are not enough to produce a proper
-production deployment.  I don't honestly know that much yet about running
-Docker in production.  See suggestions below, and use at your own risk.
-
-Similarly, this probably goes without saying, but: Just because this is Docker,
-doesn't mean I am saying anything about how well this app will scale, if you
-decide to try to run it on a cluster for some reason!  I have no idea, and make
-no promises about that.
+Consider using the "easy" way, below, instead -- it takes advantage of a cool
+application pattern that allows for much faster and more automated deployment
+and maintenance.
 
 
-First, install [docker](https://docs.docker.com/get-docker/) and
-[docker-compose](https://docs.docker.com/compose/install/).
+### The "easy" way
 
-Then:
+I've made this repo conform to the [12-factor app](https://12factor.net/)
+pattern, so it can be easily deployed on services like Heroku and Dokku.  These
+services enable nearly-automated deployment and maintenance processes, by
+cleanly decoupling the application code from its supporting services (e.g.
+databases) and configuration, and precisely specifying how and where these
+separate components come together.
 
-```console
-git clone https://github.com/dabreese00/clue-solver-django.git
-cd clue-solver-django
-docker-compose build
-docker-compose run webapp python manage.py migrate
-docker-compose up
+Heroku has plenty of good docs, if you want to spend the money there.
+
+Otherwise, below are the steps to Dokku it up.  This is definitely not a
+comprehensive production deployment yet, it still needs some security review;
+but it gets the app up and running, with SSL and backups, in potentially less
+than 30 minutes if you have a Dokku server already (or if you use e.g. the
+DigitalOcean pre-built Dokku template).
+
+- Set up a [Dokku](http://dokku.viewdocs.io/dokku/) server.
+- Optional: If you want Let's Encrypt certificate later on, give your Dokku
+  server a public IP and DNS A record now.
+- On the Dokku server, run the following command as root/with sudo:
+
+```
+sudo dokku plugin:install https://github.com/dokku/dokku-postgres.git
 ```
 
-The website is served on port 8080.
+- Either on the Dokku server, or remotely via SSH, run the following commands
+  to pre-configure the app and the database:
 
-To stop the containers, press `CTRL+C` in the terminal, or run
-`docker-compose down` from another terminal.
+```
+dokku apps:create clue-solver-django
+dokku postgres:create cluesolverdb
+dokku postgres:link cluesolverdb clue-solver-django
+```
 
-You can run `manage.py` commands inside the `webapp` container instance.  While
-the containers are stopped, simply type `docker-compose run webapp python
-manage.py command_to_run`; for example, `docker-compose run webapp python
-manage.py createsuperuser`.
+- Then run these additional commands to set the environment variables to
+  configure Django:
 
-**These are not production settings yet.  You will still need to do some
-tweaking.** I don't have all the answers, but here are some suggestions:
+```
+dokku config:set clue-solver-django DJANGO_SECRET_KEY="$(openssl rand -base64 64)"  # this may fail at first, if so either try a few times, or just run the openssl command separately instead of in a subshell
+dokku config:set clue-solver-django DJANGO_ALLOWED_HOSTS="cluesolver.dokku.fqdn.me,dokku.fqdn.me"
+```
 
-- Setup nginx to serve SSL (or put a whole separate HTTP proxy in front of it?).
-- Find a better way to distribute the PostgreSQL credentials to the containers.
-- Change the container forwarded port(s) if desired.
-- As always, review the Django settings and [Django Deployment
-  Checklist](https://docs.djangoproject.com/en/3.1/howto/deployment/checklist/).
+- Finally, git push to the Dokku server, to deploy the app:
 
-Finally a security warning: Docker will open ports _even over top of your
-firewall rules, for example UFW_.  This seems to be a known Docker issue.  See
-[here](https://github.com/chaifeng/ufw-docker) for details and methods to
-address, if you are concerned.
+```
+git remote add dokku dokku@dokku.fqdn.me:clue-solver-django
+git push dokku master
+```
+
+After this, the web app should be available; either via a subdomain or via a
+port number, depending on how you configured Dokku during installation.  If
+you're doing it the ports way, make sure to check your firewall, and if needed
+you can use "dokku proxy:ports" commands to change port mappings.  If you're
+doing it the subdomain way, you'll need to make sure you have a DNS record
+pointing the subdomain to the public IP address of your Dokku server.
+
+Database migrations were already performed automatically during the `git push`
+(thanks to the "release" line in the Procfile).
+
+Finally, get an SSL cert with [Let's Encrypt via
+Dokku](https://github.com/dokku/dokku-letsencrypt):
+
+```
+sudo dokku plugin:install https://github.com/dokku/dokku-letsencrypt.git
+dokku domains:add clue-solver-django dokku.fqdn.me
+config:set --no-restart clue-solver-django DOKKU_LETSENCRYPT_EMAIL=your@email.tld
+dokku letsencrypt clue-solver-django
+```
+
+Optionally you can add a cron job to auto-renew all certificates when needed:
+`dokku letsencrypt:cron-job --add`.
+
+
+#### Backup and recovery
+
+App data:
+
+```
+# Backup
+dokku postgres:export cluesolverdb > cluesolverdb.dump
+# Recover
+dokku postgres:import cluesolverdb < cluesolverdb.dump
+```
+
+Set up a job to regularly create and offsite these DB dumps.
+
+
+#### Other Maintenance
+
+Running Django management commands example:
+
+```
+dokku run clue-solver-django python manage.py createsuperuser
+```
+
+Ensure that if you're using SSH, you use the `-t` option or `RequestTTY` in
+your config file, so that you can get an interactive terminal.
+
+You shouldn't ever have to run `collectstatic` or `migrate` this way, because
+the Dokku/Procfile machinery is taking care of that automatically during each
+re-deployment.
+
+
+### Notes from behind the scenes of the "easy" way
+
+This Dokku deployment method is easy to do now, but it was *not* easy to get
+working in the first place.  Heroku has great, detailed docs for deploying
+specific types of apps, but Dokku does not.  And Heroku's deployment for Django
+is different enough from Dokku's, that it becomes quite difficult to sort out
+
+The main difficulty I had was understanding *how your Django project should be
+set up, to properly interact with Dokku*.
+
+Neither Django's nor Dokku's official documentation currently covers this
+almost at all.  And all the unofficial how-to's and blogs I found were
+outdated, incomplete, assumed a project file structure very different than the
+default Django tree I'm familiar with -- without explaining which
+customizations were actually necessary for Dokku -- and/or used a Dockerfile
+instead of a native Buildpack for some reason.
+
+I'm noting here some of the insights and resources that I found useful in
+learning how this works, in case I need to review one day.
+
+Key components in your Django repository/config:
+
+- Use [WhiteNoise](http://whitenoise.evans.io/en/stable/django.html) to serve
+  static files.  This avoids the need for a separate service/proxy.
+- Add a `Procfile` that specifies the command to run your WSGI app.  See Heroku
+  docs/examples or borrow from [this
+  cookiecutter](https://github.com/pydanny/cookiecutter-django).
+- Add a `runtime.txt` file that specifies your Python version.  See [Heroku
+  examples](https://github.com/heroku/python-getting-started).
+- You will probably need to edit your Django settings (see below).
+- Make sure you have a `requirements.txt` file in your repository root.  This
+  helps Heroku/Dokku detect that you have a Python app.
+- You may need to make sure your git repository's root is also the root of your
+  Django project (i.e. the folder where `manage.py` lives).  I've not seen
+  anyone explicitly say this is a 12-factor (or Heroku or Dokku) requirement,
+  but I also couldn't find any examples of people doing otherwise.  At the very
+  least, to do differently seems to require some less-than-elegant
+  work-arounds. I couldn't get it to work, and eventually gave up and just
+  re-structured my git repo to fit this format.
+
+Notes on Django settings and environment variables (the hardest part, for me at
+least):
+
+- Alter your Django `settings.py` file to read variables from the environment.
+  Any variables that differ between dev and production should be read this way,
+  instead of being "hard-coded" into the settings file -- in particular,
+  `DEBUG`, `SECRET_KEY`, `ALLOWED_HOSTS`, and `DATABASES`, maybe others too.
+- Heroku and Dokku will feed your app an environment variable called
+  `DATABASE_URL`, which needs to be parsed during your Django configuration to
+  create your Django `DATABASES['default']` dictionary.
+- [This package](https://django-environ.readthedocs.io/en/latest/) can help
+  with reading the Django configuration from the environment, including parsing
+  the `DATABASE_URL`.
+- Set your dev configuration variables using a `.env` file (which you can add
+  to your `.gitignore`).
+- Set your production configuration variables using `dokku config:set` (aside
+  from `DATABASE_URL`, which Heroku/Dokku will set automatically).
+- If you want to convert your default local SQLite database config into a
+  Heroku/Dokku-style `DATABASE_URL`, something like `sqlite:///db.sqlite3`
+  represents a relative file path of `db.sqlite3` (presumably, relative to the
+  directory from which `manage.py` is executed?) -- this seems to have the
+  results I wanted so far.
+
+Other resources I found helpful:
+
+- Create a free Heroku account and do the Python getting started tutorial.  It
+  doesn't directly translate to Dokku, but it helps give a feel for it.
+- Helpful boilerplate template, as a working example to emulate (although way
+  overkill for my needs): https://github.com/pydanny/cookiecutter-django
+- From the same boilerplate, instructions for Heroku (again doesn't translate
+  to Dokku 100%, but gives some useful pointers):
+  https://cookiecutter-django.readthedocs.io/en/latest/deployment-on-heroku.html
+
 
 ## Life's story
 
