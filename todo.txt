@@ -1,7 +1,3 @@
-- Sharing
-    - [High] License, README, and publish
-- Deployment
-    - [High] Deploy on the web
 - Input validation
     - [Medium] Validate game-consistency of new relations' members
 - CRUD

@@ -1,4 +1,3 @@
-import unittest
 from django.test import TestCase, Client
 from django.urls import reverse
 from games.models import Game, Player, GameCard
@@ -206,7 +205,6 @@ class GameplayDashboardViewTests(TestCase):
 
         self.assertEqual(response.status_code, 302)
 
-    @unittest.skip("not implemented yet")
     def test_invalid_pass_discrepant_game(self):
         g = Game.objects.create()
         g2 = Game.objects.create()
@@ -221,14 +219,20 @@ class GameplayDashboardViewTests(TestCase):
             game=g2
         )
         client = Client()
-        response = client.post(reverse('games:gameplay-dashboard', args='1'),
+        response = client.post(reverse(
+                                    'games:gameplay-dashboard',
+                                    args=str(g.id)
+                                ),
                                {
                                    'rel_type': 'P',
                                    'player': p.id,
                                    'cards': c1.id
                                })
 
-        self.assertNotEqual(response.status_code, 302)
+        with self.subTest():
+            self.assertNotEqual(response.status_code, 302)
+        with self.subTest():
+            self.assertListEqual(list(g.known_relations.filter(player=p)), [])
 
     def test_invalid_player_hand_size(self):
         g = Game.objects.create()

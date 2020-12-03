@@ -41,13 +41,13 @@ via the Admin interface.
 
 Assuming you already have Python 3.6 or higher:
 
-```console
+```
 $ git clone https://github.com/dabreese00/clue-solver-django.git
 $ cd clue-solver-django
 $ python3 -m venv .venv
 $ source .venv/bin/activate
 (.venv) $ pip install django
-(.venv) $ cd cluesolver
+(.venv) $ export DJANGO_READ_DOT_ENV_FILE=True
 (.venv) $ ./manage.py migrate
 (.venv) $ ./manage.py runserver
 ```
@@ -72,7 +72,7 @@ Rough outline (apply sysadmin common sense):
 
 - Ubuntu 18.04
 - Install prerequisites:
-```console
+```
 $ sudo apt -y install python3 python3-venv postgresql supervisor nginx git
 ```
 - Git clone the repository and `cd` into it.
