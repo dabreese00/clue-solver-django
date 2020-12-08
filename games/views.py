@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views.generic import ListView
 from django.contrib import messages
+from django.contrib.auth.decorators import login_required
 from .models import Game, Player, GameCard, ClueRelation
 from .forms import ClueRelationForm, CreateGameForm, PlayerForm
 
@@ -18,6 +19,7 @@ def clone_card_to_gamecard(card, game):
     )
 
 
+@login_required
 def create_game(request):
 
     if request.method == 'POST':
@@ -42,6 +44,7 @@ def create_game(request):
     return render(request, 'games/create_game.html', context)
 
 
+@login_required
 def gameplay_dashboard(request, game_id):
 
     game = get_object_or_404(Game, id=game_id)
@@ -66,6 +69,7 @@ def gameplay_dashboard(request, game_id):
     return render(request, 'games/gameplay_dashboard.html', context)
 
 
+@login_required
 def create_player(request, game_id):
 
     game = get_object_or_404(Game, id=game_id)

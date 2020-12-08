@@ -3,7 +3,6 @@ Django settings for cluesolver project.
 """
 
 from pathlib import Path
-import os
 import environ
 
 
@@ -30,6 +29,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'games',
     'cards',
+    'users',
 ]
 
 MIDDLEWARE = [
@@ -96,3 +96,7 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
+
+LOGIN_REDIRECT_URL = 'games:home'
+LOGOUT_REDIRECT_URL = 'games:home'
+LOGIN_URL = 'login'
