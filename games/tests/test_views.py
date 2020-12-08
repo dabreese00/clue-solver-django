@@ -1,9 +1,18 @@
 from django.test import TestCase, Client
 from django.urls import reverse
+from django.contrib.auth.models import User
 from games.models import Game, Player, GameCard
 
 
 class GameplayDashboardViewTests(TestCase):
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.user1 = User.objects.create_user("testuser")
+
+    def setUp(self):
+        self.client = Client()
+        self.client.force_login(GameplayDashboardViewTests.user1)
 
     def test_invalid_show_wrong_types(self):
         g = Game.objects.create()
@@ -27,13 +36,14 @@ class GameplayDashboardViewTests(TestCase):
             hand_size=3,
             game=g
         )
-        client = Client()
-        response = client.post(reverse('games:gameplay-dashboard', args='1'),
-                               {
-                                   'rel_type': 'S',
-                                   'player': p.id,
-                                   'cards': [c1.id, c2.id, c3.id]
-                               })
+        response = self.client.post(
+            reverse('games:gameplay-dashboard', args='1'),
+            {
+                'rel_type': 'S',
+                'player': p.id,
+                'cards': [c1.id, c2.id, c3.id],
+            }
+        )
         form = response.context['form']
 
         self.assertTrue(
@@ -65,13 +75,14 @@ class GameplayDashboardViewTests(TestCase):
             hand_size=3,
             game=g
         )
-        client = Client()
-        response = client.post(reverse('games:gameplay-dashboard', args='1'),
-                               {
-                                   'rel_type': 'S',
-                                   'player': p.id,
-                                   'cards': [c1.id, c2.id, c3.id]
-                               })
+        response = self.client.post(
+            reverse('games:gameplay-dashboard', args='1'),
+            {
+                'rel_type': 'S',
+                'player': p.id,
+                'cards': [c1.id, c2.id, c3.id],
+            }
+        )
         self.assertEqual(response.status_code, 302)
 
     def test_invalid_show_wrong_number_cards(self):
@@ -105,13 +116,14 @@ class GameplayDashboardViewTests(TestCase):
             game=g2
         )
 
-        client = Client()
-        response = client.post(reverse('games:gameplay-dashboard', args='1'),
-                               {
-                                   'rel_type': 'S',
-                                   'player': p.id,
-                                   'cards': [c1.id, c2.id]
-                               })
+        response = self.client.post(
+            reverse('games:gameplay-dashboard', args='1'),
+            {
+                'rel_type': 'S',
+                'player': p.id,
+                'cards': [c1.id, c2.id]
+            }
+        )
         form = response.context['form']
 
         self.assertTrue(
@@ -145,13 +157,14 @@ class GameplayDashboardViewTests(TestCase):
             hand_size=3,
             game=g
         )
-        client = Client()
-        response = client.post(reverse('games:gameplay-dashboard', args='1'),
-                               {
-                                   'rel_type': 'H',
-                                   'player': p.id,
-                                   'cards': [c1.id, c2.id]
-                               })
+        response = self.client.post(
+            reverse('games:gameplay-dashboard', args='1'),
+            {
+                'rel_type': 'H',
+                'player': p.id,
+                'cards': [c1.id, c2.id]
+            }
+        )
         form = response.context['form']
 
         self.assertTrue(
@@ -173,13 +186,14 @@ class GameplayDashboardViewTests(TestCase):
             hand_size=3,
             game=g
         )
-        client = Client()
-        response = client.post(reverse('games:gameplay-dashboard', args='1'),
-                               {
-                                   'rel_type': 'H',
-                                   'player': p.id,
-                                   'cards': c1.id
-                               })
+        response = self.client.post(
+            reverse('games:gameplay-dashboard', args='1'),
+            {
+                'rel_type': 'H',
+                'player': p.id,
+                'cards': c1.id
+            }
+        )
 
         self.assertEqual(response.status_code, 302)
 
@@ -195,13 +209,14 @@ class GameplayDashboardViewTests(TestCase):
             hand_size=3,
             game=g
         )
-        client = Client()
-        response = client.post(reverse('games:gameplay-dashboard', args='1'),
-                               {
-                                   'rel_type': 'P',
-                                   'player': p.id,
-                                   'cards': c1.id
-                               })
+        response = self.client.post(
+            reverse('games:gameplay-dashboard', args='1'),
+            {
+                'rel_type': 'P',
+                'player': p.id,
+                'cards': c1.id
+            }
+        )
 
         self.assertEqual(response.status_code, 302)
 
@@ -218,16 +233,14 @@ class GameplayDashboardViewTests(TestCase):
             hand_size=3,
             game=g2
         )
-        client = Client()
-        response = client.post(reverse(
-                                    'games:gameplay-dashboard',
-                                    args=str(g.id)
-                                ),
-                               {
-                                   'rel_type': 'P',
-                                   'player': p.id,
-                                   'cards': c1.id
-                               })
+        response = self.client.post(
+            reverse('games:gameplay-dashboard', args=str(g.id)),
+            {
+                'rel_type': 'P',
+                'player': p.id,
+                'cards': c1.id
+            }
+        )
 
         with self.subTest():
             self.assertNotEqual(response.status_code, 302)
@@ -279,14 +292,15 @@ class GameplayDashboardViewTests(TestCase):
 
         # Upon adding player "d", players collectively have 13 cards, leaving
         # only 2 for the confidential file.
-        client = Client()
 
         # Form submission should succeed
-        response = client.post(reverse('games:create-player', args='1'),
-                               {
-                                   'name': 'd',
-                                   'hand_size': 4
-                               })
+        response = self.client.post(
+            reverse('games:create-player', args='1'),
+            {
+                'name': 'd',
+                'hand_size': 4
+            }
+        )
 
         self.assertEqual(
             response.status_code,
@@ -294,7 +308,8 @@ class GameplayDashboardViewTests(TestCase):
         )
 
         # But the dashboard template should be aware of the mismatch
-        response = client.get(reverse('games:gameplay-dashboard', args='1'))
+        response = self.client.get(
+            reverse('games:gameplay-dashboard', args='1'))
 
         self.assertFalse(response.context['game'].hand_sizes_add_up)
 
@@ -341,20 +356,21 @@ class GameplayDashboardViewTests(TestCase):
                 game=g
             ))
 
-        client = Client()
-
         # Form submission should succeed
-        response = client.post(reverse('games:create-player', args='1'),
-                               {
-                                   'name': 'd',
-                                   'hand_size': 3
-                               })
+        response = self.client.post(
+            reverse('games:create-player', args='1'),
+            {
+                'name': 'd',
+                'hand_size': 3
+            }
+        )
 
         self.assertEqual(
             response.status_code,
             302
         )
 
-        response = client.get(reverse('games:gameplay-dashboard', args='1'))
+        response = self.client.get(
+            reverse('games:gameplay-dashboard', args='1'))
 
         self.assertTrue(response.context['game'].hand_sizes_add_up)
