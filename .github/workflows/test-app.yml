@@ -33,4 +33,4 @@ jobs:
         flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
     - name: Test
       run: |
-        DJANGO_READ_DOT_ENV_FILE=True python manage.py test
+        DJANGO_SECRET_KEY="sosecret" DJANGO_ALLOWED_HOSTS="127.0.0.1" DJANGO_DEBUG=True DATABASE_URL="sqlite:///db.sqlite3" python manage.py test
