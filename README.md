@@ -39,30 +39,30 @@ via the Admin interface.
 
 ## How to develop
 
-Assuming you already have Python 3.6 or higher:
+Assuming you already have Python 3.8.5 or higher:
 
 ```
 $ git clone https://github.com/dabreese00/clue-solver-django.git
 $ cd clue-solver-django
 $ python3 -m venv .venv
 $ source .venv/bin/activate
-(.venv) $ pip install django
-(.venv) $ export DJANGO_READ_DOT_ENV_FILE=True
+(.venv) $ pip install pip-tools
+(.venv) $ pip-sync requirements.txt dev-requirements.txt
+(.venv) $ export DJANGO_SECRET_KEY="sosecret"; export DJANGO_ALLOWED_HOSTS="127.0.0.1"; export DJANGO_DEBUG=True; export DATABASE_URL="sqlite:///db.sqlite3"
 (.venv) $ ./manage.py migrate
+(.venv) $ ./manage.py collectstatic
+(.venv) $ ./manage.py test
 (.venv) $ ./manage.py runserver
 ```
 
-Open a browser, navigate to `127.0.0.1:8000`, and you are up and running!
-
-(For Mac, the 3rd line "python3" might be different.  For Windows, the 3rd and
-4th lines at least will be different.)
+(The 3rd line "python3" might be different depending on your OS; you should use your system's Python 3 binary, whatever it's called.)
 
 
 ## How to deploy
 
-Django requires:
+System requirements:
 
-- Python 3.6 or higher
+- Python 3.8.5 or higher
 - PostgreSQL 9.5 or higher
 
 
@@ -70,7 +70,7 @@ Django requires:
 
 Rough outline (apply sysadmin common sense):
 
-- Ubuntu 18.04
+- Ubuntu 20.04
 - Install prerequisites:
 ```
 $ sudo apt -y install python3 python3-venv postgresql supervisor nginx git
