@@ -17,6 +17,9 @@
 - Sharing
     - [Low] Write a setup.py file [1] [2]
     - [Low] Publish to PyPI
+- Docker
+    - [High] Figure out how Dockerfile changes Dokku deploy steps
+    - [High] Update README to cover docker dev/deploy
 
 
 
