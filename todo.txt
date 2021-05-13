@@ -1,9 +1,9 @@
 - Input validation
     - [Medium] Validate game-consistency of new relations' members
 - CRUD
-    - [High] User authentication
     - [Medium] Delete games
     - [Low] Update and delete players
+    - [Low] Make games player-private, and allow sharing.
 - Styling
     - [Medium] Bootstrap all forms
     - [Low] Add CRUD success messages throughout
@@ -17,10 +17,6 @@
 - Sharing
     - [Low] Write a setup.py file [1] [2]
     - [Low] Publish to PyPI
-- Docker
-    - [High] Figure out how Dockerfile changes Dokku deploy steps
-    - [High] Update README to cover docker dev/deploy
-
 
 
 [1] https://packaging.python.org/guides/distributing-packages-using-setuptools/#configuring-your-project

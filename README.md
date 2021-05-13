@@ -4,7 +4,6 @@ Track your [Clue](https://en.wikipedia.org/wiki/Cluedo) games with a convenient 
 
 Currently it lets you create and track games.
 
-- User authentication coming soon.
 - Better input workflow coming soon.
 - Optionally catching your obvious mistakes, coming soon.
 - "Cheat mode" coming soon... ;)
@@ -55,18 +54,26 @@ $ source .venv/bin/activate
 (.venv) $ ./manage.py runserver
 ```
 
+You can also use a `.env` file to store the environment variables instead of
+having to type them every time.
+
 (The 3rd line "python3" might be different depending on your OS; you should use your system's Python 3 binary, whatever it's called.)
+
+This app is also dockerized, and you can run `docker-compose up` to have a
+local instance running with a PostgreSQL backend.
 
 
 ## How to deploy
 
 System requirements:
 
-- Python 3.8.5 or higher
-- PostgreSQL 9.5 or higher
+- Python 3.9 or higher
+- PostgreSQL 10 or higher
+
+May work with older versions but not tested.
 
 
-### The hard way
+### The old-fashioned way
 
 Rough outline (apply sysadmin common sense):
 
@@ -88,12 +95,8 @@ Don't forget SSL (best use Let's Encrypt).
 
 Then you can use PostgreSQL dumps and/or Django dumps for backup and recovery.
 
-Consider using the "easy" way, below, instead -- it takes advantage of a cool
-application pattern that allows for much faster and more automated deployment
-and maintenance.
 
-
-### The "easy" way
+### The Dokku way
 
 I've made this repo conform to the [12-factor app](https://12factor.net/)
 pattern, so it can be easily deployed on services like Heroku and Dokku.  These
@@ -135,6 +138,11 @@ dokku postgres:link cluesolverdb clue-solver-django
 dokku config:set clue-solver-django DJANGO_SECRET_KEY="$(openssl rand -base64 64)"  # this may fail at first, if so either try a few times, or just run the openssl command separately instead of in a subshell
 dokku config:set clue-solver-django DJANGO_ALLOWED_HOSTS="cluesolver.dokku.fqdn.me,dokku.fqdn.me"
 ```
+
+Note that since there is a Dockerfile in the root of the repository, Dokku will
+auto-select to deploy using the Dockerfile builder.  If you want the Herokuish
+buildpack builder instead, you can set that as a config option for the app in
+Dokku -- see the Dokku docs.
 
 - Finally, git push to the Dokku server, to deploy the app:
 
@@ -197,7 +205,7 @@ the Dokku/Procfile machinery is taking care of that automatically during each
 re-deployment.
 
 
-### Notes from behind the scenes of the "easy" way
+### Notes from behind the scenes of the Dokku way
 
 This Dokku deployment method is easy to do now, but it was *not* easy to get
 working in the first place.  Heroku has great, detailed docs for deploying
