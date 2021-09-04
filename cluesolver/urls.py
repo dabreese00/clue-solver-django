@@ -7,4 +7,6 @@ urlpatterns = [
     path('cards/', include('cards.urls')),
     path('users/', include('django.contrib.auth.urls')),
     path('users/', include('users.urls')),
+    path('api-auth/', include('rest_framework.urls')),
+    path('api/', include('api.urls')),
 ]
